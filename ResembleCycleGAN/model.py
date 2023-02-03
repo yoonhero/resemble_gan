@@ -106,7 +106,7 @@ class Generator(nn.Module):
             ]
         )
 
-        self.residual_blocks = nn.Sequential(
+        self.res_blocks = nn.Sequential(
             *[ResidualBlock(num_features*4) for _ in range(num_residuals)]
         )
 
@@ -120,7 +120,20 @@ class Generator(nn.Module):
         )
 
         self.last = nn.Conv2d(num_features*1, img_channels,
-                              kernel_size=7, stride=1, padding=3)
+                              kernel_size=7, stride=1, padding=3, padding_mode="reflect",
+                              )
+
+    def forward(self, x):
+        x = self.initial(x)
+
+        for layer in self.down_blocks:
+            x = layer(x)
+        x = self.res_blocks(x)
+
+        for layer in self.up_blocks:
+            x = layer(x)
+
+        return torch.tanh(self.last(x))
 
 
 def test_dicriminator():
