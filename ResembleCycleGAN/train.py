@@ -34,30 +34,27 @@ device = torch.device("cuda")
 # Hyper Parameters
 if not args.is_colab:
     batch_size = config.BATCH_SIZE
-
     load_model = config.LOAD_MODEL
     checkpoint_gen_h = config.CHECKPOINT_GEN_H
     ckeckpoint_gen_z = config.CHECKPOINT_GEN_Z
     checkpoint_disc_h = config.CHECKPOINT_DISC_H
     checkpoint_disc_z = config.CHECKPOINT_DISC_Z
-
     path_human_image = config.PATH_HUMAN_IMAGES
     path_animal_image = config.PATH_ANIMAL_IMAGES
+    result_images_path = "saved_images"
 
 else:
     batch_size = args.batch_size
-
     load_model = args.load_model
-
     google_drive_path = args.google_drive_path
-
     checkpoint_gen_h = google_drive_path + "/models/genh.pth.tar"
     checkpoint_gen_z = google_drive_path + "/models/genz.pth.tar"
     checkpoint_disc_h = google_drive_path + "/models/critich.pth.tar"
     checkpoint_disc_z = google_drive_path + "/models/criticz.pth.tar"
-
     path_human_image = google_drive_path + "/dataset/after/human/*"
     path_animal_image = google_drive_path + "/dataset/after/animal/*"
+    trained_model_path = google_drive_path + "/models"
+    result_images_path = google_drive_path + "/saved_images"
 
 
 gaussian_noise_rate = config.GAUSSIAN_NOISE_RATE
@@ -90,11 +87,11 @@ def save_result(gen_Z, gen_H):
     test_image_preds = gen_H(test_image)
 
     save_image(torch.cat((target_human * 0.5 + 0.5, fake_human * 0.5 +
-               0.5), dim=0), f"saved_images/human_{epoch}.png")
+               0.5), dim=0), f"{result_images_path}/human_{epoch}.png")
     save_image(torch.cat((target_animal * 0.5 + 0.5, fake_animal *
-               0.5 + 0.5), dim=0), f"saved_images/animal_{epoch}.png")
+               0.5 + 0.5), dim=0), f"{result_images_path}/animal_{epoch}.png")
     save_image(torch.cat((test_image*0.5+0.5, test_image_preds *
-               0.5+0.5), dim=0), f"saved_images/test_{epoch}.png")
+               0.5+0.5), dim=0), f"{result_images_path}/test_{epoch}.png")
 
 
 # Train function for 1 Epoch.
@@ -177,8 +174,8 @@ def train_loop(disc_H, disc_Z, gen_Z, gen_H, loader, opt_disc, opt_gen, l1, mse,
 
         loop.set_postfix(d_loss=d_loss/(idx+1), g_loss=g_loss/(idx+1))
 
-    if not os.path.exists("saved_images/"):
-        os.makedirs("saved_images")
+    if not os.path.exists(result_images_path):
+        os.makedirs(result_images_path)
 
     save_result(gen_Z, gen_H)
 
@@ -204,8 +201,8 @@ L1 = nn.L1Loss()
 mse = nn.MSELoss()
 
 
-if not os.path.exists("./models/"):
-    os.makedirs("./models/")
+if not os.path.exists(trained_model_path):
+    os.makedirs(trained_model_path)
 
 
 if load_model:
