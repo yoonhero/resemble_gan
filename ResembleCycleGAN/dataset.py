@@ -46,7 +46,7 @@ class ResembleDataset(Dataset):
         return human_img, animal_img
     
     @staticmethod
-    def sort_key(path): return int(path.split("\\")[-1].split("_")[-1].split(".")[0])
+    def sort_key(path): return int(path.split("\\")[-2].split("_")[-1].split(".")[0])
 
 
 if __name__ == "__main__":
