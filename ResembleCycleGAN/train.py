@@ -79,6 +79,7 @@ target_human, target_animal = target_human.to(device), target_animal.to(device)
 
 test_image = Image.open("./test_image.JPG")
 test_image = transform(test_image)
+test_image = test_image.unsqueeze(0)
 
 
 def save_result(gen_Z, gen_H):
