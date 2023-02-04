@@ -13,7 +13,7 @@ transform = config.TRANSFORM
 num_res_blocks = config.NUM_RES_BLOCKS
 checkpoint_file = config.CHECKPOINT_GEN_H
 
-model = Generator(num_res_blocks=num_res_blocks)
+model = Generator(num_res_blocks=num_res_blocks).to(device)
 checkpoint = torch.load(checkpoint_file, map_location=device)
 
 model.load_state_dict(checkpoint["state_dict"])
@@ -30,7 +30,7 @@ def inference(image):
 
 
 if __name__ == "__main__":
-    image = Image.open("test_image.JPG")
+    image = Image.open("../dataset/before/human/train_108.jpg").convert("RGB")
 
     result = inference(image)
 

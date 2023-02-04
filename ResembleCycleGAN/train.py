@@ -23,6 +23,7 @@ parser.add_argument("--load-model", dest="load_model",
 parser.add_argument("--batch-size", dest="batch_size", type=int, default=1)
 parser.add_argument("--google-drive-path", dest="google_drive_path", type=str,
                     default="/content/drive/My Drive")
+parser.add_argument("--start-epoch", dest="start_epoch", type=int, default=1)
 args = parser.parse_args()
 
 
@@ -42,6 +43,7 @@ if not args.is_colab:
     path_human_image = config.PATH_HUMAN_IMAGES
     path_animal_image = config.PATH_ANIMAL_IMAGES
     result_images_path = "saved_images"
+    start_epoch = config.END_EPOCH+1
 
 else:
     batch_size = args.batch_size
@@ -55,7 +57,7 @@ else:
     path_animal_image = google_drive_path + "/dataset/after/animal/*"
     trained_model_path = google_drive_path + "/models"
     result_images_path = google_drive_path + "/saved_images"
-
+    start_epoch = args.start_epoch
 
 gaussian_noise_rate = config.GAUSSIAN_NOISE_RATE
 num_res_blocks = config.NUM_RES_BLOCKS
@@ -64,7 +66,6 @@ learning_rate = config.LEARNING_RATE
 LAMBDA_IDENTITY = config.LAMBDA_IDENTITY
 LAMBDA_CYCLE = config.LAMBDA_CYCLE
 nb_epochs = config.NB_EPOCHS
-start_epoch = config.END_EPOCH+1
 
 transform = config.TRANSFORM
 transforms = config.TRANSFORMS

@@ -16,10 +16,10 @@ GAUSSIAN_NOISE_RATE = 0.05
 NUM_RES_BLOCKS = 9
 
 LOAD_MODEL = True
-CHECKPOINT_GEN_H = "./models/genh.pth.tar"
-CHECKPOINT_GEN_Z = "./models/genz.pth.tar"
-CHECKPOINT_DISC_H = "./models/critich.pth.tar"
-CHECKPOINT_DISC_Z = "./models/criticz.pth.tar"
+CHECKPOINT_GEN_H = "../models/cyclegan/genh.pth.tar"
+CHECKPOINT_GEN_Z = "../models/cyclegan/genz.pth.tar"
+CHECKPOINT_DISC_H = "../models/cyclegan/critich.pth.tar"
+CHECKPOINT_DISC_Z = "../models/cyclegan/criticz.pth.tar"
 
 PATH_HUMAN_IMAGES = "../dataset/before/human/*"
 PATH_ANIMAL_IMAGES = "../dataset/before/animal/*"
