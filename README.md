@@ -15,7 +15,7 @@ While I studied Generative Adversial Network models, I wondered if I can make a 
 
 ## CycleGAN
 
-[CycleGAN](https://github.com/yoonhero/Brainstormers/blob/master/study_log/Generative-Model.md#cyclegan) is one of the most popular method for image-to-image translation. I make two pairs of Generator and Discriminator. I trained this model on Google Colab for 100 epochs. 
+[CycleGAN](https://github.com/yoonhero/Brainstormers/blob/master/study_log/Generative-Model.md#cyclegan) is one of the most popular methods for image-to-image translation. I make two pairs of Generator and Discriminator. I trained this model on Google Colab for 500 epochs for an 2 hours with premium GPU.
 
 [code](https://github.com/yoonhero/resemble_gan/tree/model-release/ResembleCycleGAN)
 
@@ -25,8 +25,6 @@ While I studied Generative Adversial Network models, I wondered if I can make a 
 |Human2Animal|![human2animal](./ResembleCycleGAN/docs/human2animal.gif)|
 |Animal2Human|![animal2human](./ResembleCycleGAN/docs/animal2human.gif)|
 
-
-
-
+The result was great for dataset input. But as you can see in the Test GIF, this model creates like a input not an animal face when new input comes in..
 
 
