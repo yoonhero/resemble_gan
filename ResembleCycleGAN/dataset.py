@@ -12,8 +12,8 @@ class ResembleDataset(Dataset):
         self.x = glob.glob(path_human)
         self.y = glob.glob(path_animal)
 
-        self.x = sorted(x, key=lambda x: ResembleDataset.sort_key(x))
-        self.y = sorted(y, key=lambda y: ResembleDataset.sort_key(y))
+        self.x = sorted(self.x, key=lambda x: ResembleDataset.sort_key(x))
+        self.y = sorted(self.y, key=lambda y: ResembleDataset.sort_key(y))
 
         self.len_x = len(self.x)
         self.len_y = len(self.y)

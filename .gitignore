@@ -162,3 +162,7 @@ cython_debug/
 
 dataset/
 models/
+
+
+saved_images/
+ResembleCyckeGAN/saved_images

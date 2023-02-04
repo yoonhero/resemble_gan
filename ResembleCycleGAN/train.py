@@ -75,7 +75,7 @@ dataset = ResembleDataset(path_human_image, path_animal_image, transform)
 loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 
-target_human, target_animal = next(iter(loader))
+target_human, target_animal = next(iter(loader))[0:3]
 target_human, target_animal = target_human.to(device), target_animal.to(device)
 
 test_image = Image.open("./test_image.JPG")
