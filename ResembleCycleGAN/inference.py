@@ -22,7 +22,7 @@ model.load_state_dict(checkpoint["state_dict"])
 def inference(image):
     transformed_image = transform(image)
 
-    batched_image = transformed_image.unsqueeze(0)
+    batched_image = transformed_image.unsqueeze(0).to(device)
 
     preds = model(batched_image)
 

@@ -48,7 +48,7 @@ else:
     load_model = args.load_model
     google_drive_path = args.google_drive_path
     checkpoint_gen_h = google_drive_path + "/models/genh.pth.tar"
-    checkpoint_gen_z = google_drive_path + "/models/genz.pth.tar"
+    ckeckpoint_gen_z = google_drive_path + "/models/genz.pth.tar"
     checkpoint_disc_h = google_drive_path + "/models/critich.pth.tar"
     checkpoint_disc_z = google_drive_path + "/models/criticz.pth.tar"
     path_human_image = google_drive_path + "/dataset/after/human/*"
