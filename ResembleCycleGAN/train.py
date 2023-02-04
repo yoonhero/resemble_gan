@@ -4,36 +4,68 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 from tqdm import tqdm
 from torchvision.utils import save_image
-import numpy as np
-from PIL import Image
-import torchvision.transforms as T
-import matplotlib.pyplot as plt
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import os
-import torch
-import gc
+from PIL import Image
 
 from dataset import ResembleDataset
 # from model import Discriminator, Generator
 from discriminator import Discriminator
 from generator import Generator
-from utils import save_checkpoint
+from utils import save_checkpoint, load_checkpoint, clear_cache
+import config
 
-# Clean Cache
-gc.collect()
-torch.cuda.empty_cache()
+clear_cache()
 
 # Set Device for Training
-device = torch.device("cuda" if torch.cuda.is_available else "cpu")
+device = torch.device("cuda")
 
 # Hyper Parameters
-learning_rate = 0.0002
-LAMBDA_IDENTITY = 0.0
-LAMBDA_CYCLE = 10
-nb_epochs = 100
-gaussian_noise_rate = 0.05
-num_res_blocks = 9
+learning_rate = config.LEARNING_RATE
+LAMBDA_IDENTITY = config.LAMBDA_IDENTITY
+LAMBDA_CYCLE = config.LAMBDA_CYCLE
+nb_epochs = config.nb_epochs
+start_epoch = config.END_EPOCH+1
+batch_size = config.BATCH_SIZE
+
+gaussian_noise_rate = config.GAUSSIAN_NOISE_RATE
+num_res_blocks = config.NUM_RES_BLOCKS
+
+load_model = config.LOAD_MODEL
+checkpoint_gen_h = config.CHECKPOINT_GEN_H
+ckeckpoint_gen_z = config.CHECKPOINT_GEN_Z
+checkpoint_disc_h = config.CHECKPOINT_DISC_H
+checkpoint_disc_z = config.CHECKPOINT_DISC_Z
+
+
+path_human_image = config.PATH_HUMAN_IMAGES
+path_animal_image = config.PATH_ANIMAL_IMAGES
+
+transform = config.TRANSFORM
+transforms = config.TRANSFORMS
+
+
+dataset = ResembleDataset(path_human_image, path_animal_image, transform)
+loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+
+target_human, target_animal = next(iter(loader))
+target_human, target_animal = target_human.to(device), target_animal.to(device)
+
+test_image = Image.open("./test_image.JPG")
+test_image = transform(test_image)
+
+
+def save_result(gen_Z, gen_H):
+    fake_animal = gen_H(target_human)
+    fake_human = gen_Z(target_animal)
+    test_image_preds = gen_H(test_image)
+
+    save_image(torch.cat((target_human * 0.5 + 0.5, fake_human * 0.5 +
+               0.5), dim=0), f"saved_images/human_{epoch}.png")
+    save_image(torch.cat((target_animal * 0.5 + 0.5, fake_animal *
+               0.5 + 0.5), dim=0), f"saved_images/animal_{epoch}.png")
+    save_image(torch.cat((test_image*0.5+0.5, test_image_preds *
+               0.5+0.5), dim=0), f"saved_images/test_{epoch}.png")
 
 
 # Train function for 1 Epoch.
@@ -94,18 +126,18 @@ def train_loop(disc_H, disc_Z, gen_Z, gen_H, loader, opt_disc, opt_gen, l1, mse,
         cycle_animal_loss = l1(animal, cycle_animal)
 
         # identity loss => keep color theme
-        # identity_animal = gen_Z(animal)
-        # identity_human = gen_H(human)
-        # identity_human_loss = l1(identity_human, human)
-        # identity_animal_loss = l1(identity_animal, animal)
+        identity_animal = gen_Z(animal)
+        identity_human = gen_H(human)
+        identity_human_loss = l1(identity_human, human)
+        identity_animal_loss = l1(identity_animal, animal)
 
         G_loss = (
             loss_G_Z
             + loss_G_H
             + LAMBDA_CYCLE*cycle_human_loss
             + LAMBDA_CYCLE*cycle_animal_loss
-            #   + LAMBDA_IDENTITY*identity_human_loss
-            #   + LAMBDA_IDENTITY*identity_animal_loss
+            + LAMBDA_IDENTITY*identity_human_loss
+            + LAMBDA_IDENTITY*identity_animal_loss
         )
 
         g_loss += G_loss.item()
@@ -118,10 +150,8 @@ def train_loop(disc_H, disc_Z, gen_Z, gen_H, loader, opt_disc, opt_gen, l1, mse,
 
     if not os.path.exists("saved_images/"):
         os.makedirs("saved_images")
-    save_image(torch.concat((fake_human * 0.5 + 0.5, human * 0.5 +
-               0.5), dim=0), f"saved_images/human_{epoch}.png")
-    save_image(torch.concat((fake_animal * 0.5 + 0.5, animal *
-               0.5 + 0.5), dim=0), f"saved_images/animal_{epoch}.png")
+
+    save_result(gen_Z, gen_H)
 
 
 disc_H = Discriminator(gaussian_noise_rate=gaussian_noise_rate).to(device)
@@ -144,38 +174,23 @@ opt_gen = optim.Adam(
 L1 = nn.L1Loss()
 mse = nn.MSELoss()
 
-path_human_image = "../dataset/before/human/*"
-path_animal_image = "../dataset/before/animal/*"
-
-transform = T.Compose([T.Resize((256, 256), 0), T.ToTensor(),])
-transforms = A.Compose(
-    [
-        A.Resize(width=256, height=256),
-        A.HorizontalFlip(p=0.5),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[
-                    0.5, 0.5, 0.5], max_pixel_value=255),
-        ToTensorV2(),
-    ],
-    additional_targets={"image0": "image"},
-)
-
-
-dataset = ResembleDataset(path_human_image, path_animal_image, transform)
-loader = DataLoader(dataset, batch_size=1, shuffle=True)
-
-g_scaler = torch.cuda.amp.GradScaler()
-d_scaler = torch.cuda.amp.GradScaler()
-
 
 if not os.path.exists("./models/"):
     os.makedirs("./models/")
 
 
-for epoch in range(nb_epochs):
+if load_model:
+    load_checkpoint(checkpoint_gen_h, gen_H, opt_gen, learning_rate)
+    load_checkpoint(ckeckpoint_gen_z, gen_Z, opt_gen, learning_rate)
+    load_checkpoint(checkpoint_disc_h, disc_H, opt_disc, learning_rate)
+    load_checkpoint(checkpoint_disc_z, disc_Z, opt_disc, learning_rate)
+
+
+for epoch in range(start_epoch, nb_epochs):
     train_loop(disc_H, disc_Z, gen_Z, gen_H, loader, opt_disc,
                opt_gen, L1, mse,  epoch)
 
-    save_checkpoint(gen_H, opt_gen, filename="./models/genh.pth.tar")
-    save_checkpoint(gen_Z, opt_gen, filename="./models/genz.pth.tar")
-    save_checkpoint(disc_H, opt_disc, filename="./models/critich.pth.tar")
-    save_checkpoint(disc_Z, opt_disc, filename="./models/criticz.pth.tar")
+    save_checkpoint(gen_H, opt_gen, filename=checkpoint_gen_h)
+    save_checkpoint(gen_Z, opt_gen, filename=ckeckpoint_gen_z)
+    save_checkpoint(disc_H, opt_disc, filename=checkpoint_disc_h)
+    save_checkpoint(disc_Z, opt_disc, filename=checkpoint_disc_z)
