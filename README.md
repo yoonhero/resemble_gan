@@ -10,7 +10,7 @@ While I studied Generative Adversial Network models, I wondered if I can make a 
 
 |input|output|
 |:---:|:---:|
-|![input_image](./ResembleCycleGAN/docs/input_example.jpg)|![output_image](./ResembleCycleGAN/docs/result_example.jpg)|
+|![input_image](./ResembleCycleGAN/docs/train_human.jpg)|![output_image](./ResembleCycleGAN/docs/train_animal.jpg)|
 
 
 ## CycleGAN
@@ -19,13 +19,14 @@ While I studied Generative Adversial Network models, I wondered if I can make a 
 
 [code](https://github.com/yoonhero/resemble_gan/tree/model-release/ResembleCycleGAN)
 
-- First Try
+|||
+|:---:|:---:|
+|Test|![test](./ResembleCycleGAN/docs/result.gif)|
+|Human2Animal|![human2animal](./ResembleCycleGAN/docs/human2animal.gif)|
+|Animal2Human|![animal2human](./ResembleCycleGAN/docs/animal2human.gif)|
 
-![test](./ResembleCycleGAN/result.gif)
-
-![human2animal](./ResembleCycleGAN/human2animal.gif)
 
 
-![animal2human](./ResembleCycleGAN/animal2human.gif)
+
 
 
