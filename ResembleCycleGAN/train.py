@@ -23,7 +23,7 @@ device = torch.device("cuda")
 learning_rate = config.LEARNING_RATE
 LAMBDA_IDENTITY = config.LAMBDA_IDENTITY
 LAMBDA_CYCLE = config.LAMBDA_CYCLE
-nb_epochs = config.nb_epochs
+nb_epochs = config.NB_EPOCHS
 start_epoch = config.END_EPOCH+1
 batch_size = config.BATCH_SIZE
 

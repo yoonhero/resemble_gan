@@ -4,12 +4,13 @@ from albumentations.pytorch import ToTensorV2
 
 # Hyper Parameters
 LEARNING_RATE = 0.0002
-LAMBDA_IDENTITY = 0.0
+LAMBDA_IDENTITY = 5
 LAMBDA_CYCLE = 10
 
 NB_EPOCHS = 1500
 END_EPOCH = 13
-BATCH_SIZE = 4
+# 4 2 x => cuda out of memory issue
+BATCH_SIZE = 1
 
 GAUSSIAN_NOISE_RATE = 0.05
 NUM_RES_BLOCKS = 9
