@@ -6,6 +6,7 @@ from tqdm import tqdm
 from torchvision.utils import save_image
 import os
 from PIL import Image
+import argparse
 
 from dataset import ResembleDataset
 # from model import Discriminator, Generator
@@ -14,31 +15,59 @@ from generator import Generator
 from utils import save_checkpoint, load_checkpoint, clear_cache
 import config
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--is-colab", dest="is_colab",
+                    action="store_true", default=False)
+parser.add_argument("--load-model", dest="load_model",
+                    action="store_true", default=False)
+parser.add_argument("--batch-size", dest="batch_size", type=int, default=1)
+parser.add_argument("--google-drive-path", dest="google_drive_path", type=str,
+                    default="/content/drive/My Drive")
+args = parser.parse_args()
+
+
 clear_cache()
 
 # Set Device for Training
 device = torch.device("cuda")
 
 # Hyper Parameters
+if not args.is_colab:
+    batch_size = config.BATCH_SIZE
+
+    load_model = config.LOAD_MODEL
+    checkpoint_gen_h = config.CHECKPOINT_GEN_H
+    ckeckpoint_gen_z = config.CHECKPOINT_GEN_Z
+    checkpoint_disc_h = config.CHECKPOINT_DISC_H
+    checkpoint_disc_z = config.CHECKPOINT_DISC_Z
+
+    path_human_image = config.PATH_HUMAN_IMAGES
+    path_animal_image = config.PATH_ANIMAL_IMAGES
+
+else:
+    batch_size = args.batch_size
+
+    load_model = args.load_model
+
+    google_drive_path = args.google_drive_path
+
+    checkpoint_gen_h = google_drive_path + "/models/genh.pth.tar"
+    checkpoint_gen_z = google_drive_path + "/models/genz.pth.tar"
+    checkpoint_disc_h = google_drive_path + "/models/critich.pth.tar"
+    checkpoint_disc_z = google_drive_path + "/models/criticz.pth.tar"
+
+    path_human_image = google_drive_path + "/dataset/after/human/*"
+    path_animal_image = google_drive_path + "/dataset/after/animal/*"
+
+
+gaussian_noise_rate = config.GAUSSIAN_NOISE_RATE
+num_res_blocks = config.NUM_RES_BLOCKS
+
 learning_rate = config.LEARNING_RATE
 LAMBDA_IDENTITY = config.LAMBDA_IDENTITY
 LAMBDA_CYCLE = config.LAMBDA_CYCLE
 nb_epochs = config.NB_EPOCHS
 start_epoch = config.END_EPOCH+1
-batch_size = config.BATCH_SIZE
-
-gaussian_noise_rate = config.GAUSSIAN_NOISE_RATE
-num_res_blocks = config.NUM_RES_BLOCKS
-
-load_model = config.LOAD_MODEL
-checkpoint_gen_h = config.CHECKPOINT_GEN_H
-ckeckpoint_gen_z = config.CHECKPOINT_GEN_Z
-checkpoint_disc_h = config.CHECKPOINT_DISC_H
-checkpoint_disc_z = config.CHECKPOINT_DISC_Z
-
-
-path_human_image = config.PATH_HUMAN_IMAGES
-path_animal_image = config.PATH_ANIMAL_IMAGES
 
 transform = config.TRANSFORM
 transforms = config.TRANSFORMS
