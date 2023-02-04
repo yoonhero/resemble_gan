@@ -7,9 +7,10 @@ While I studied Generative Adversial Network models, I wondered if I can make a 
 
 ## Data Preparation
 
-(|input|output|
+
+|input|output|
 |:---:|:---:|
-|![input_image](./ResembleCycleGAN/docs/input_example.jpg)|![output_image](./ResembleCycleGAN/docs/output_example.jpg)|)
+|![input_image](./ResembleCycleGAN/docs/input_example.jpg)|![output_image](./ResembleCycleGAN/docs/result_example.jpg)|
 
 
 ## CycleGAN
