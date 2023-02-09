@@ -166,3 +166,5 @@ models/
 
 saved_images/
 ResembleCyckeGAN/saved_images/
+
+ResemblePsPNetwork/stylegan2/
